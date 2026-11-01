@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="emuMOS6502/emuMOS6502.vcxproj" Id="b401a883-fdd1-4f6a-b7a0-f7b128b209f7" />
+</Solution>
