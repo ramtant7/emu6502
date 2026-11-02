@@ -81,7 +81,34 @@ int Cpu::compare(const struct state *want, uint32_t want_cycles, int cycles)
 
 void Cpu::set_flag(uint8_t flag, int on)
 {
-	p = (uint8_t)((p & ~flag) | (on ? flag : 0));
+	if (on == 0) {                        //  (on ? flag : 0) если верно то первое иначе второе
+		p = (uint8_t)((p & ~flag) | 0);
+	}
+	else
+	{
+		p = (uint8_t)((p & ~flag) | flag);
+	}
+}
+
+uint8_t Cpu::set_nz(uint8_t v) {
+	p = (uint8_t)((p & ~(FLAG_N | FLAG_Z)) | (v & FLAG_N) | (v ? 0 : FLAG_Z)); //(биты флагов N и Z сбросятся до 0) (смотрит на старший бит числа)
+	return v;
+}
+
+void Cpu::inx() {
+	x = set_nz((uint8_t)(x + 1));
+}
+
+void Cpu::iny() {
+	y = set_nz((uint8_t)(y + 1));
+}
+
+void Cpu::dex() {
+	x = set_nz((uint8_t)(x - 1));
+}
+
+void Cpu::dey() {
+	y = set_nz((uint8_t)(y - 1));
 }
 
 
@@ -94,7 +121,20 @@ int Cpu::execute(uint8_t op) {
 	int crossed = 0;
 	
 	switch (op) {
-	case 0x18: set_flag(FLAG_C, 0); return 2;
+	case 0x18: set_flag(FLAG_C, 0); return 2; //CLC
+	case 0x38: set_flag(FLAG_C, 1); return 2; //SEC
+	case 0x58: set_flag(FLAG_I, 0); return 2; //CLI
+	case 0x78: set_flag(FLAG_I, 1); return 2; //SEI
+	case 0xD8: set_flag(FLAG_D, 0); return 2; //CLD
+	case 0xF8: set_flag(FLAG_D, 1); return 2; //SED
+	case 0xB8: set_flag(FLAG_V, 0); return 2; //CLV
+
+	case 0xE8: inx(); return 2; //INX
+	case 0xC8: iny(); return 2; //INY
+	case 0xCA: dex(); return 2; //DEX
+	case 0x88: dey(); return 2; //DEY
+
+	case 0xEA: return 2; //NOP
 // остальные инструкции
 
 	default:

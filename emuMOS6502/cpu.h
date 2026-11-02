@@ -30,4 +30,12 @@ private:
 	int execute(uint8_t op);
 	int check(const char* name, uint32_t want, uint32_t got);
 	void set_flag(uint8_t flag, int on);
+	uint8_t set_nz(uint8_t v);
+
+
+
+	void inx();
+	void iny();
+	void dex();
+	void dey();
 };
