@@ -33,9 +33,16 @@ private:
 	uint8_t set_nz(uint8_t v);
 
 
-
 	void inx();
 	void iny();
 	void dex();
 	void dey();
+
+	uint8_t pull();
+	void push(uint8_t v);
+
+	void push_a();
+	void pull_a();
+	void push_p();
+	void pull_p();
 };

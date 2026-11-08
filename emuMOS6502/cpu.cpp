@@ -111,6 +111,38 @@ void Cpu::dey() {
 	y = set_nz((uint8_t)(y - 1));
 }
 
+void Cpu::push(uint8_t v)
+{
+	mem->write((uint16_t)(0x100 | sp--), v);
+}
+
+uint8_t Cpu::pull()
+{
+	return mem->read((uint16_t)(0x100 | ++sp));
+}
+
+void Cpu::push_a() 
+{
+	push(a);
+}
+
+void Cpu::pull_a() 
+{
+	a = set_nz(pull());
+}
+
+void Cpu::push_p()
+{
+	push(p | FLAG_B | FLAG_U);
+}
+
+void Cpu::pull_p()
+{
+	p = (uint8_t)((pull() & ~FLAG_B) | FLAG_U);
+}
+
+
+
 
 uint16_t Cpu::read16(uint16_t addr)
 {
@@ -121,6 +153,12 @@ int Cpu::execute(uint8_t op) {
 	int crossed = 0;
 	
 	switch (op) {
+
+	case 0x48: push_a(); return 3; //PHA
+	case 0x68: pull_a(); return 4; //PLA
+	case 0x08: push_p(); return 3; //PHP
+	case 0x28: pull_p(); return 4; //PLP
+
 	case 0x18: set_flag(FLAG_C, 0); return 2; //CLC
 	case 0x38: set_flag(FLAG_C, 1); return 2; //SEC
 	case 0x58: set_flag(FLAG_I, 0); return 2; //CLI
