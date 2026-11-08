@@ -111,6 +111,32 @@ void Cpu::dey() {
 	y = set_nz((uint8_t)(y - 1));
 }
 
+uint16_t Cpu::read16_in_page(uint16_t addr)
+{
+	uint16_t hi = (uint16_t)((addr & 0xFF00) | ((addr + 1) & 0xFF));
+	return (uint16_t)(mem->read(addr) | mem->read(hi) << 8);
+}
+
+uint8_t Cpu::fetch()
+{
+	return mem->read(pc++);
+}
+
+uint16_t Cpu::fetch16()
+{
+	uint8_t lo = fetch();
+	return (uint16_t)(lo | fetch() << 8);
+}
+
+uint16_t Cpu::indexed(uint16_t base, uint8_t index, int* crossed)
+{
+	uint16_t addr = (uint16_t)(base + index);
+	*crossed = (base ^ addr) > 0xFF;
+	return addr;
+}
+
+
+
 void Cpu::push(uint8_t v)
 {
 	mem->write((uint16_t)(0x100 | sp--), v);
@@ -139,6 +165,68 @@ void Cpu::push_p()
 void Cpu::pull_p()
 {
 	p = (uint8_t)((pull() & ~FLAG_B) | FLAG_U);
+}
+
+void Cpu::and_imm() 
+{
+	a = set_nz(a & fetch());
+}
+
+void Cpu::and_abs() 
+{
+	a = set_nz(a & mem->read(fetch16()));
+}
+
+void Cpu::and_zp() 
+{
+	a = set_nz(a & mem->read(fetch()));
+}
+
+void Cpu::and_zpx() 
+{
+	uint16_t addr = (uint8_t)(fetch() + x);
+
+	a = set_nz(a & mem->read(addr));
+}
+
+void Cpu::and_izx()
+{
+	uint16_t addr = read16_in_page((uint8_t)(fetch() + x));
+
+	a = set_nz(a & mem->read(addr));
+}
+
+int Cpu::and_izy()
+{
+	int crossed;
+
+	uint16_t addr = indexed(read16_in_page(fetch()), y, &crossed);
+
+	a = set_nz(a & mem->read(addr));
+
+	return crossed;
+}
+
+int Cpu::and_abx()
+{
+	int crossed;
+
+	uint16_t addr = indexed(fetch16(), x, &crossed);
+
+	a = set_nz(a & mem->read(addr));
+
+	return crossed;
+}
+
+int Cpu::and_aby()
+{
+	int crossed;
+
+	uint16_t addr = indexed(fetch16(), y, &crossed);
+
+	a = set_nz(a & mem->read(addr));
+
+	return crossed;
 }
 
 
@@ -171,6 +259,15 @@ int Cpu::execute(uint8_t op) {
 	case 0xC8: iny(); return 2; //INY
 	case 0xCA: dex(); return 2; //DEX
 	case 0x88: dey(); return 2; //DEY
+
+	case 0x29: and_imm(); return 2; //AND
+	case 0x2D: and_abs(); return 4; //AND
+	case 0x25: and_zp(); return 3; //AND
+	case 0x35: and_zpx(); return 4; //AND
+	case 0x21: and_izx(); return 6; //AND
+	case 0x31: return 5 + and_izy(); //AND
+	case 0x3D: return 4 + and_abx(); //AND
+	case 0x39: return 4 + and_aby(); //AND
 
 	case 0xEA: return 2; //NOP
 // остальные инструкции

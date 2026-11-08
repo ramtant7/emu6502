@@ -31,6 +31,10 @@ private:
 	int check(const char* name, uint32_t want, uint32_t got);
 	void set_flag(uint8_t flag, int on);
 	uint8_t set_nz(uint8_t v);
+	uint16_t read16_in_page(uint16_t addr);
+	uint8_t fetch();
+	uint16_t fetch16();
+	uint16_t indexed(uint16_t base, uint8_t index, int* crossed);
 
 
 	void inx();
@@ -40,9 +44,17 @@ private:
 
 	uint8_t pull();
 	void push(uint8_t v);
-
 	void push_a();
 	void pull_a();
 	void push_p();
 	void pull_p();
+
+	void and_imm();
+	void and_abs();
+	void and_zp();
+	void and_zpx();
+	void and_izx();
+	int and_izy();
+	int and_abx();
+	int and_aby();
 };
