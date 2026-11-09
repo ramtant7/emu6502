@@ -57,4 +57,32 @@ private:
 	int and_izy();
 	int and_abx();
 	int and_aby();
+
+	void or_imm();
+	void or_abs();
+	void or_zp();
+	void or_zpx();
+	void or_izx();
+	int or_izy();
+	int or_abx();
+	int or_aby();
+
+	void xor_imm();
+	void xor_abs();
+	void xor_zp();
+	void xor_zpx();
+	void xor_izx();
+	int xor_izy();
+	int xor_abx();
+	int xor_aby();
+
+	void lda_imm();
+	void lda_abs();
+	void lda_zp();
+	void lda_zpx();
+	void lda_izx();
+	int lda_izy();
+	int lda_abx();
+	int lda_aby();
+
 };
