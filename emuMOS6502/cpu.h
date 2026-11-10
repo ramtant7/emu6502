@@ -85,4 +85,16 @@ private:
 	int lda_abx();
 	int lda_aby();
 
+	void ldx_imm();
+	void ldx_abs();
+	void ldx_zp();
+	void ldx_zpy();
+	int ldx_aby();
+
+	void ldy_imm();
+	void ldy_abs();
+	void ldy_zp();
+	void ldy_zpx();
+	int ldy_abx();
+
 };

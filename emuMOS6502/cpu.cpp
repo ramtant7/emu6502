@@ -423,6 +423,79 @@ int Cpu::lda_aby()
 	return crossed;
 }
 
+// LDX
+
+void Cpu::ldx_imm()
+{
+	x = set_nz(fetch());
+}
+
+void Cpu::ldx_abs()
+{
+	x = set_nz(mem->read(fetch16()));
+}
+
+void Cpu::ldx_zp()
+{
+	x = set_nz(mem->read(fetch()));
+}
+
+void Cpu::ldx_zpy()
+{
+	uint16_t addr = (uint8_t)(fetch() + y);
+
+	x = set_nz(mem->read(addr));
+}
+
+int Cpu::ldx_aby()
+{
+	int crossed;
+
+	uint16_t addr = indexed(fetch16(), y, &crossed);
+
+	x = set_nz(mem->read(addr));
+
+	return crossed;
+}
+
+// LDY
+
+void Cpu::ldy_imm()
+{
+	y = set_nz(fetch());
+}
+
+void Cpu::ldy_abs()
+{
+	y = set_nz(mem->read(fetch16()));
+}
+
+void Cpu::ldy_zp()
+{
+	y = set_nz(mem->read(fetch()));
+}
+
+void Cpu::ldy_zpx()
+{
+	uint16_t addr = (uint8_t)(fetch() + x);
+
+	y = set_nz(mem->read(addr));
+}
+
+int Cpu::ldy_abx()
+{
+	int crossed;
+
+	uint16_t addr = indexed(fetch16(), x, &crossed);
+
+	y = set_nz(mem->read(addr));
+
+	return crossed;
+}
+
+
+
+
 
 
 
@@ -490,6 +563,18 @@ int Cpu::execute(uint8_t op) {
 	case 0xB1: return 5 + lda_izy(); //LDA
 	case 0xBD: return 4 + lda_abx(); //LDA
 	case 0xB9: return 4 + lda_aby(); //LDA
+
+	case 0xA2: ldx_imm(); return 2;
+	case 0xAE: ldx_abs(); return 4;
+	case 0xA6: ldx_zp(); return 3;
+	case 0xB6: ldx_zpy(); return 4;
+	case 0xBE: return 4 + ldx_aby();
+
+	case 0xA0: ldy_imm(); return 2;
+	case 0xAC: ldy_abs(); return 4;
+	case 0xA4: ldy_zp(); return 3;
+	case 0xB4: ldy_zpx(); return 4;
+	case 0xBC: return 4 + ldy_abx();
 
 	case 0xEA: return 2; //NOP
 // остальные инструкции
