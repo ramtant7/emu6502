@@ -97,4 +97,20 @@ private:
 	void ldy_zpx();
 	int ldy_abx();
 
+	void sta_abs();
+	void sta_zp();
+	void sta_zpx();
+	void sta_izx();
+	void sta_izy();
+	void sta_abx();
+	void sta_aby();
+
+	void stx_abs();
+	void stx_zp();
+	void stx_zpy();
+
+	void sty_abs();
+	void sty_zp();
+	void sty_zpx();
+
 };

@@ -493,12 +493,88 @@ int Cpu::ldy_abx()
 	return crossed;
 }
 
+// STA
 
+void Cpu::sta_abs()
+{
+	mem->write(fetch16(), a);
+}
 
+void Cpu::sta_zp()
+{
+	mem->write(fetch(), a);
+}
 
+void Cpu::sta_zpx()
+{
+	mem->write((uint8_t)(fetch() + x), a);
+}
 
+void Cpu::sta_izx()
+{
+	mem->write(read16_in_page((uint8_t)(fetch() + x)), a);
+}
 
+void Cpu::sta_izy()
+{
+	int crossed;
 
+	uint16_t addr = indexed(read16_in_page(fetch()), y, &crossed);
+
+	mem->write(addr, a);
+}
+
+void Cpu::sta_abx()
+{
+	int crossed;
+
+	uint16_t addr = indexed(fetch16(), x, &  crossed);
+
+	mem->write(addr, a);
+}
+
+void Cpu::sta_aby()
+{
+	int crossed;
+
+	uint16_t addr = indexed(fetch16(), y, &crossed);
+
+	mem->write(addr, a);
+}
+
+// STX
+
+void Cpu::stx_abs()
+{
+	mem->write(fetch16(), x);
+}
+
+void Cpu::stx_zp()
+{
+	mem->write(fetch(), x);
+}
+
+void Cpu::stx_zpy()
+{
+	mem->write((uint8_t)(fetch() + y), x);
+}
+
+// STY
+
+void Cpu::sty_abs()
+{
+	mem->write(fetch16(), y);
+}
+
+void Cpu::sty_zp()
+{
+	mem->write(fetch(), y);
+}
+
+void Cpu::sty_zpx()
+{
+	mem->write((uint8_t)(fetch() + x), y);
+}
 
 uint16_t Cpu::read16(uint16_t addr)
 {
@@ -564,17 +640,33 @@ int Cpu::execute(uint8_t op) {
 	case 0xBD: return 4 + lda_abx(); //LDA
 	case 0xB9: return 4 + lda_aby(); //LDA
 
-	case 0xA2: ldx_imm(); return 2;
-	case 0xAE: ldx_abs(); return 4;
-	case 0xA6: ldx_zp(); return 3;
-	case 0xB6: ldx_zpy(); return 4;
-	case 0xBE: return 4 + ldx_aby();
+	case 0xA2: ldx_imm(); return 2; //LDX
+	case 0xAE: ldx_abs(); return 4; //LDX
+	case 0xA6: ldx_zp(); return 3; //LDX
+	case 0xB6: ldx_zpy(); return 4; //LDX
+	case 0xBE: return 4 + ldx_aby(); //LDX
 
-	case 0xA0: ldy_imm(); return 2;
-	case 0xAC: ldy_abs(); return 4;
-	case 0xA4: ldy_zp(); return 3;
-	case 0xB4: ldy_zpx(); return 4;
-	case 0xBC: return 4 + ldy_abx();
+	case 0xA0: ldy_imm(); return 2; //LDY
+	case 0xAC: ldy_abs(); return 4; //LDY
+	case 0xA4: ldy_zp(); return 3; //LDY
+	case 0xB4: ldy_zpx(); return 4; //LDY
+	case 0xBC: return 4 + ldy_abx(); //LDY
+
+	case 0x8D: sta_abs(); return 4; //STA
+	case 0x85: sta_zp(); return 3; //STA
+	case 0x95: sta_zpx(); return 4; //STA
+	case 0x81: sta_izx(); return 6; //STA
+	case 0x91: sta_izy(); return 6; //STA
+	case 0x9D: sta_abx(); return 5; //STA
+	case 0x99: sta_aby(); return 5; //STA
+
+	case 0x8E: stx_abs(); return 4; //STX
+	case 0x86: stx_zp(); return 3; //STX
+	case 0x96: stx_zpy(); return 4; //STX
+
+	case 0x8C: sty_abs(); return 4; //STY
+	case 0x84: sty_zp(); return 3; //STY
+	case 0x94: sty_zpx(); return 4; //STY
 
 	case 0xEA: return 2; //NOP
 // остальные инструкции
